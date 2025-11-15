@@ -69,7 +69,7 @@ public class ToursHanoi
             StdDraw.setPenColor(new Color(0, 0, 0, 30));
             StdDraw.filledRectangle(x + 3, baseY - 3, baseLargeur, baseHauteur);
 
-            // Base principale (marron clair)
+            // Base principale
             StdDraw.setPenColor(new Color(160, 120, 80));
             StdDraw.filledRectangle(x, baseY, baseLargeur, baseHauteur);
 
@@ -88,7 +88,7 @@ public class ToursHanoi
         {
             int x = positionX(i);
 
-            // Surbrillance pour tour sélectionnée (plus claire)
+            // Surbrillance pour tour sélectionnée
             if (i == tourSelectionnee)
             {
                 StdDraw.setPenColor(new Color(255, 255, 200, 120));
@@ -110,24 +110,24 @@ public class ToursHanoi
             StdDraw.setPenRadius();
         }
 
-        // DISQUES avec effet 3D amélioré
+        // DISQUES
         for (int i = 0; i < N_TOUR; i++)
         {
             dessinerDisques(i, poteauY + 5);
         }
 
-        // Labels des tours sous la base
+        // Nom des tours sous la base
         StdDraw.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 14));
         StdDraw.setPenColor(Color.BLACK);
         
         int x0 = positionX(0);
-        StdDraw.text(x0, baseY - 30, "départ");
+        StdDraw.text(x0, baseY - 30, "Départ");
         
         int x1 = positionX(1);
         StdDraw.text(x1, baseY - 30, "");
         
         int x2 = positionX(2);
-        StdDraw.text(x2, baseY - 30, "arrivée");
+        StdDraw.text(x2, baseY - 30, "Arrivée");
 
         StdDraw.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 32));
         StdDraw.setPenColor(Color.BLACK);
@@ -164,7 +164,7 @@ public class ToursHanoi
         
         StdDraw.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 18));
         StdDraw.setPenColor(Color.BLACK);
-        StdDraw.text(px - 40, py, "Moves:");
+        StdDraw.text(px - 40, py, "Déplacement : ");
         
         StdDraw.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 24));
         StdDraw.text(px + 20, py, "" + coups);
