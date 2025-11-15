@@ -8,7 +8,7 @@
 
 ```bash
 # Cloner le dépôt
-git clone https://github.com/your-username/Tours_Hanoi.git
+git clone [https://github.com/your-username/Tours_Hanoi.git](Tours_Hanoi)
 cd Tours_Hanoi
 
 # Compiler les fichiers
