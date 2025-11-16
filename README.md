@@ -1,6 +1,6 @@
 # Tours_Hanoi
 
-**Jeu des Tours de Hanoï** interactif en **Java**, utilisant **StdDraw** pour l’interface graphique.
+Un **jeu des Tours de Hanoï** développé en **Java**, combinant une interface graphique **StdDraw** et une gestion des disques basée sur des **piles (Stack)**
 
 ---
 
