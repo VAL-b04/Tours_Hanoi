@@ -12,6 +12,10 @@ public class ToursHanoi
     public static int tourSelectionnee = -1;
     public static int coups = 0;
     public static Stack<int[]> historique = new Stack<>();
+    
+    // Variables pour éviter les rafraîchissements inutiles
+    private static boolean needsRedraw = true;
+    private static boolean wasMousePressed = false;
 
     public static void main(String[] args)
     {
@@ -21,10 +25,17 @@ public class ToursHanoi
         StdDraw.enableDoubleBuffering();
 
         initialiser();
+        dessiner(); // Premier dessin
 
         while (true)
         {
-            dessiner();
+            // Ne redessiner que si nécessaire
+            if (needsRedraw)
+            {
+                dessiner();
+                needsRedraw = false;
+            }
+            
             gererClic();
             StdDraw.pause(20);
 
@@ -49,6 +60,7 @@ public class ToursHanoi
         
         coups = 0;
         historique.clear();
+        needsRedraw = true;
     }
 
     public static void dessiner()
@@ -144,20 +156,6 @@ public class ToursHanoi
         StdDraw.show();
     }
 
-    public static void dessinerFondDegrade()
-    {
-        int nbBandes = 50;
-        for (int i = 0; i < nbBandes; i++)
-        {
-            float ratio = (float) i / nbBandes;
-            int r = (int) (30 + ratio * 20);
-            int g = (int) (40 + ratio * 30);
-            int b = (int) (70 + ratio * 50);
-            StdDraw.setPenColor(new Color(r, g, b));
-            StdDraw.filledRectangle(WIDTH / 2, HEIGHT - i * (HEIGHT / nbBandes) - (HEIGHT / nbBandes) / 2, WIDTH / 2, (HEIGHT / nbBandes) / 2);
-        }
-    }
-
     public static void dessinerPanneauStats()
     {
         int px = WIDTH / 2, py = 30;
@@ -167,7 +165,7 @@ public class ToursHanoi
         StdDraw.text(px - 40, py, "Déplacement : ");
         
         StdDraw.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 24));
-        StdDraw.text(px + 20, py, "" + coups);
+        StdDraw.text(px + 40, py, "" + coups);
     }
 
     public static void dessinerBoutonRetour()
@@ -255,58 +253,60 @@ public class ToursHanoi
 
     public static void gererClic()
     {
-        if (!StdDraw.isMousePressed())
+        boolean isPressed = StdDraw.isMousePressed();
+        
+        // Détecter le moment où la souris est relâchée (transition pressed -> not pressed)
+        if (wasMousePressed && !isPressed)
         {
-            return;
-        }
+            double mx = StdDraw.mouseX();
+            double my = StdDraw.mouseY();
 
-        double mx = StdDraw.mouseX();
-        double my = StdDraw.mouseY();
-
-        // Vérifier clic sur bouton retour
-        int bx = 90, by = 30;
-        if (mx > bx - 70 && mx < bx + 70 && my > by - 20 && my < by + 20)
-        {
-            if (!historique.isEmpty())
+            // Vérifier clic sur bouton retour
+            int bx = 90, by = 30;
+            if (mx > bx - 70 && mx < bx + 70 && my > by - 20 && my < by + 20)
             {
-                int[] move = historique.pop();
-                int disc = tours[move[1]].pop();
-                tours[move[0]].push(disc);
-                coups--;
+                if (!historique.isEmpty())
+                {
+                    int[] move = historique.pop();
+                    int disc = tours[move[1]].pop();
+                    tours[move[0]].push(disc);
+                    coups--;
+                    needsRedraw = true;
+                }
+                wasMousePressed = false;
+                return;
             }
-            while (StdDraw.isMousePressed())
-            {
-                StdDraw.pause(10);
-            }
-            return;
-        }
 
-        int tourCliquee = obtenirTour(mx);
-        if (tourCliquee == -1)
-        {
-            while (StdDraw.isMousePressed()) StdDraw.pause(10);
-            return;
-        }
-
-        if (tourSelectionnee == -1)
-        {
-            if (!tours[tourCliquee].isEmpty())
+            int tourCliquee = obtenirTour(mx);
+            if (tourCliquee == -1)
             {
-                tourSelectionnee = tourCliquee;
+                wasMousePressed = false;
+                return;
+            }
+
+            if (tourSelectionnee == -1)
+            {
+                if (!tours[tourCliquee].isEmpty())
+                {
+                    tourSelectionnee = tourCliquee;
+                    needsRedraw = true;
+                }
+            }
+            else
+            {
+                if (estValide(tourSelectionnee, tourCliquee))
+                {
+                    tours[tourCliquee].push(tours[tourSelectionnee].pop());
+                    historique.push(new int[]{tourSelectionnee, tourCliquee});
+                    coups++;
+                    needsRedraw = true;
+                }
+                tourSelectionnee = -1;
+                needsRedraw = true;
             }
         }
-        else
-        {
-            if (estValide(tourSelectionnee, tourCliquee))
-            {
-                tours[tourCliquee].push(tours[tourSelectionnee].pop());
-                historique.push(new int[]{tourSelectionnee, tourCliquee});
-                coups++;
-            }
-            tourSelectionnee = -1;
-        }
-
-        while (StdDraw.isMousePressed()) StdDraw.pause(10);
+        
+        wasMousePressed = isPressed;
     }
 
     public static int obtenirTour(double x)
@@ -354,7 +354,7 @@ public class ToursHanoi
             
             StdDraw.setPenColor(new Color(100, 255, 150));
             StdDraw.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 32));
-            StdDraw.text(WIDTH / 2, HEIGHT / 2 - 30, "Vous avez gagne en " + coups + " coups !");
+            StdDraw.text(WIDTH / 2, HEIGHT / 2 - 30, "Vous avez gagné en " + coups + " coups !");
             
             int coupsMin = (int) Math.pow(2, N_DISQUES) - 1;
             StdDraw.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 20));
